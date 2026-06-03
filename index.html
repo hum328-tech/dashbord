@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard Comercial</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Segoe UI,Arial,sans-serif;
+  background:#f4f5f7;
+  color:#222;
+  overflow:hidden;
+}
+.app{
+  height:100vh;
+  display:grid;
+  grid-template-columns:190px 1fr;
+}
+.sidebar{
+  background:#222;
+  color:white;
+  padding:18px;
+}
+.logo{
+  width:95px;
+  height:95px;
+  border-radius:16px;
+  display:block;
+  margin:0 auto 18px;
+  background:#f0e52d;
+}
+.sidebar h2{
+  font-size:16px;
+  text-align:center;
+  margin:5px 0 25px;
+}
+.menu div{
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:10px;
+  background:#333;
+  font-size:14px;
+}
+.menu .activo{
+  background:#f59a23;
+  color:#111;
+  font-weight:700;
+}
+.main{
+  padding:14px;
+  display:grid;
+  grid-template-rows:60px 110px 1fr 170px;
+  gap:12px;
+}
+.header{
+  background:white;
+  border-radius:14px;
+  padding:12px 18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.08);
+}
+.header h1{
+  margin:0;
+  font-size:24px;
+}
+.fecha{
+  font-size:13px;
+  color:#666;
+}
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+.kpi{
+  background:white;
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 3px 10px rgba(0,0,0,.08);
+  border-top:6px solid #f0e52d;
+}
+.kpi h3{
+  margin:0;
+  font-size:13px;
+  color:#666;
+}
+.kpi p{
+  margin:8px 0 0;
+  font-size:25px;
+  font-weight:800;
+}
+.kpi span{
+  color:#f59a23;
+  font-size:13px;
+}
+.charts{
+  display:grid;
+  grid-template-columns:2fr 1.2fr 1fr;
+  gap:12px;
+  min-height:0;
+}
+.card{
+  background:white;
+  border-radius:14px;
+  padding:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,.08);
+  min-height:0;
+}
+.card h3{
+  margin:0 0 6px;
+  font-size:15px;
+}
+canvas{
+  width:100%!important;
+  height:88%!important;
+}
+.bottom{
+  display:grid;
+  grid-template-columns:1.3fr 1fr;
+  gap:12px;
+  min-height:0;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+}
+th{
+  background:#222;
+  color:white;
+  padding:7px;
+}
+td{
+  padding:6px;
+  border-bottom:1px solid #eee;
+  text-align:center;
+}
+tr:nth-child(even){background:#fafafa}
+.badge{
+  background:#f0e52d;
+  padding:4px 8px;
+  border-radius:20px;
+  font-weight:700;
+}
+.ranking{
+  display:grid;
+  gap:8px;
+}
+.rank{
+  background:#f8f9fa;
+  padding:9px;
+  border-radius:10px;
+  display:flex;
+  justify-content:space-between;
+  border-left:6px solid #f59a23;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <img src="logo.png" class="logo">
+    <h2>Reporte Comercial</h2>
+
+    <div class="menu">
+      <div class="activo">Dashboard</div>
+      <div>Sucursales</div>
+      <div>Ventas</div>
+      <div>Piezas</div>
+      <div>Resumen</div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <section class="header">
+      <div>
+        <h1>Dashboard Ejecutivo de Sucursales</h1>
+        <div class="fecha">Actualización automática del reporte</div>
+      </div>
+      <div class="badge">Sucursal estrella: SUCURSAL29</div>
+    </section>
+
+    <section class="kpis">
+      <div class="kpi">
+        <h3>Venta total</h3>
+        <p id="ventaTotal"></p>
+        <span>Ingresos generales</span>
+      </div>
+      <div class="kpi">
+        <h3>Piezas totales</h3>
+        <p id="piezasTotal"></p>
+        <span>Volumen vendido</span>
+      </div>
+      <div class="kpi">
+        <h3>Ticket por pieza</h3>
+        <p id="ticket"></p>
+        <span>Promedio general</span>
+      </div>
+      <div class="kpi">
+        <h3>Sucursal líder</h3>
+        <p>SUC29</p>
+        <span>Mayor venta total</span>
+      </div>
+    </section>
+
+    <section class="charts">
+      <div class="card">
+        <h3>Ventas por sucursal - Top 10</h3>
+        <canvas id="ventasChart"></canvas>
+      </div>
+      <div class="card">
+        <h3>Participación por venta</h3>
+        <canvas id="donutChart"></canvas>
+      </div>
+      <div class="card">
+        <h3>Piezas vendidas - Top 10</h3>
+        <canvas id="piezasChart"></canvas>
+      </div>
+    </section>
+
+    <section class="bottom">
+      <div class="card">
+        <h3>Resumen por sucursal</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Sucursal</th>
+              <th>Piezas A</th>
+              <th>Venta A</th>
+              <th>Piezas B</th>
+              <th>Venta B</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="tabla"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Ranking de mejores sucursales</h3>
+        <div class="ranking" id="ranking"></div>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<script>
+const datos = [
+["MATRIZ",15,1375.05,312,7222.80],
+["SUCURSAL01",4,366.68,15,347.25],
+["SUCURSAL02",6,550.02,20,463.00],
+["SUCURSAL03",29,2658.43,192,4444.80],
+["SUCURSAL04",8,733.36,79,1828.85],
+["SUCURSAL05",4,366.68,382,8843.30],
+["SUCURSAL06",8,733.36,180,4167.00],
+["SUCURSAL07",1,91.67,31,717.65],
+["SUCURSAL08",9,825.03,180,4167.00],
+["SUCURSAL09",6,550.02,150,3472.50],
+["SUCURSAL10",14,1283.38,189,4375.35],
+["SUCURSAL11",3,275.01,36,833.40],
+["SUCURSAL12",1,91.67,1,23.15],
+["SUCURSAL13",8,733.36,138,3194.70],
+["SUCURSAL14",15,1375.05,123,2847.45],
+["SUCURSAL15",8,733.36,35,810.25],
+["SUCURSAL16",6,550.02,50,1157.50],
+["SUCURSAL17",7,641.69,56,1296.40],
+["SUCURSAL18",28,2566.76,274,6343.10],
+["SUCURSAL19",4,366.68,82,1898.30],
+["SUCURSAL20",15,1375.05,196,4537.40],
+["SUCURSAL21",2,183.34,27,625.05],
+["SUCURSAL22",7,641.69,34,787.10],
+["SUCURSAL23",2,183.34,53,1226.95],
+["SUCURSAL24",7,641.69,400,9260.00],
+["SUCURSAL25",2,183.34,15,347.25],
+["SUCURSAL26",16,1466.72,75,1736.25],
+["SUCURSAL27",5,458.35,56,1296.40],
+["SUCURSAL28",5,458.35,75,1736.25],
+["SUCURSAL29",25,2291.75,1222,28289.30],
+["SUCURSAL30",8,733.36,79,1828.85],
+["SUCURSAL31",13,1191.71,122,2824.30],
+["SUCURSAL32",2,183.34,7,162.05],
+["SUCURSAL33",7,641.69,78,1805.70]
+];
+
+const money = n => "$" + n.toLocaleString("es-MX",{minimumFractionDigits:2});
+const totalVenta = datos.reduce((a,d)=>a+d[2]+d[4],0);
+const totalPiezas = datos.reduce((a,d)=>a+d[1]+d[3],0);
+
+document.getElementById("ventaTotal").textContent = money(totalVenta);
+document.getElementById("piezasTotal").textContent = totalPiezas.toLocaleString("es-MX");
+document.getElementById("ticket").textContent = money(totalVenta/totalPiezas);
+
+const ordenadas = datos.map(d=>({
+  sucursal:d[0],
+  piezas:d[1]+d[3],
+  venta:d[2]+d[4],
+  a:d[1],
+  va:d[2],
+  b:d[3],
+  vb:d[4]
+})).sort((a,b)=>b.venta-a.venta);
+
+const top10 = ordenadas.slice(0,10);
+
+document.getElementById("tabla").innerHTML = ordenadas.slice(0,8).map(d=>`
+<tr>
+<td>${d.sucursal}</td>
+<td>${d.a}</td>
+<td>${money(d.va)}</td>
+<td>${d.b}</td>
+<td>${money(d.vb)}</td>
+<td><b>${money(d.venta)}</b></td>
+</tr>
+`).join("");
+
+document.getElementById("ranking").innerHTML = ordenadas.slice(0,6).map((d,i)=>`
+<div class="rank">
+  <strong>${i+1}. ${d.sucursal}</strong>
+  <span>${money(d.venta)}</span>
+</div>
+`).join("");
+
+new Chart(document.getElementById("ventasChart"),{
+  type:"bar",
+  data:{
+    labels:top10.map(d=>d.sucursal),
+    datasets:[{
+      label:"Venta total",
+      data:top10.map(d=>d.venta),
+      backgroundColor:"#f59a23",
+      borderRadius:8
+    }]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{ticks:{font:{size:10}}},
+      y:{ticks:{font:{size:10}}}
+    }
+  }
+});
+
+new Chart(document.getElementById("donutChart"),{
+  type:"doughnut",
+  data:{
+    labels:top10.map(d=>d.sucursal),
+    datasets:[{
+      data:top10.map(d=>d.venta),
+      backgroundColor:[
+        "#f0e52d","#f59a23","#222","#666","#999",
+        "#ffc857","#ffb703","#fb8500","#8d99ae","#adb5bd"
+      ]
+    }]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{legend:{position:"bottom",labels:{boxWidth:10,font:{size:10}}}}
+  }
+});
+
+new Chart(document.getElementById("piezasChart"),{
+  type:"bar",
+  data:{
+    labels:top10.map(d=>d.sucursal),
+    datasets:[{
+      label:"Piezas",
+      data:top10.map(d=>d.piezas),
+      backgroundColor:"#f0e52d",
+      borderRadius:8
+    }]
+  },
+  options:{
+    indexAxis:"y",
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{ticks:{font:{size:10}}},
+      y:{ticks:{font:{size:10}}}
+    }
+  }
+});
+</script>
+
+</body>
+</html>
