@@ -13,7 +13,7 @@ body{
   font-family:Segoe UI,Arial,sans-serif;
   background:#f4f5f7;
   color:#222;
-  overflow:hidden;
+  overflow:auto;
 }
 .app{
   height:100vh;
@@ -51,10 +51,11 @@ body{
   font-weight:700;
 }
 .main{
-  padding:14px;
+  padding:10px;
   display:grid;
-  grid-template-rows:60px 110px 1fr 170px;
-  gap:12px;
+  grid-template-rows:55px 95px 330px 160px;
+  gap:8px;
+  min-width:1150px;
 }
 .header{
   background:white;
@@ -91,8 +92,8 @@ body{
   color:#666;
 }
 .kpi p{
-  margin:8px 0 0;
-  font-size:25px;
+  margin:6px 0 0;
+  font-size:22px;
   font-weight:800;
 }
 .kpi span{
@@ -118,7 +119,7 @@ body{
 }
 canvas{
   width:100%!important;
-  height:88%!important;
+  height:260px!important;
 }
 .bottom{
   display:grid;
