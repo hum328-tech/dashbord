@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Admin Dashboard</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 body{
   font-family:Arial,sans-serif;
@@ -47,10 +47,10 @@ input{margin:20px 0;}
 </div>
 
 <script>
-const SUPABASE_URL = "https://fwfthzdrywbjyhndrxih.supabase.co/rest/v1/";
+const SUPABASE_URL = "https://fwfthzdrywbjyhndrxih.supabase.co";
 const SUPABASE_KEY = "sb_publishable_D3HRCOhWUIgmnMPpAN3E8Q__d7ZZCKi";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 function limpiarNumero(valor){
   if(!valor) return 0;
@@ -91,7 +91,7 @@ async function subirCSV(){
 
   mensaje.textContent = "Borrando datos anteriores...";
 
-  const { error: deleteError } = await supabase
+  const { error: deleteError } = await supabaseClient
     .from("ventas_sucursales")
     .delete()
     .neq("id", 0);
@@ -103,7 +103,7 @@ async function subirCSV(){
 
   mensaje.textContent = "Subiendo datos nuevos...";
 
-  const { error: insertError } = await supabase
+  const { error: insertError } = await supabaseClient
     .from("ventas_sucursales")
     .insert(datos);
 
