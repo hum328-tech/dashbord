@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{
+  font-family:Arial,sans-serif;
+  background:#f4f5f7;
+  padding:40px;
+}
+.card{
+  max-width:600px;
+  margin:auto;
+  background:white;
+  padding:30px;
+  border-radius:18px;
+  box-shadow:0 8px 20px rgba(0,0,0,.12);
+}
+button{
+  background:#f59a23;
+  border:0;
+  padding:14px 22px;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+}
+input{margin:20px 0;}
+#mensaje{
+  margin-top:20px;
+  font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Panel de carga</h1>
+  <p>Selecciona el archivo CSV actualizado.</p>
+
+  <input type="file" id="archivo" accept=".csv">
+  <br>
+  <button onclick="subirCSV()">Subir datos</button>
+
+  <div id="mensaje"></div>
+</div>
+
+<script>
+const SUPABASE_URL = "TU_SUPABASE_URL";
+const SUPABASE_KEY = "TU_ANON_KEY";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function limpiarNumero(valor){
+  if(!valor) return 0;
+  return Number(
+    valor.toString()
+    .replace(/\$/g,"")
+    .replace(/,/g,"")
+    .replace(/\s/g,"")
+  ) || 0;
+}
+
+async function subirCSV(){
+  const input = document.getElementById("archivo");
+  const mensaje = document.getElementById("mensaje");
+
+  if(!input.files.length){
+    mensaje.textContent = "Selecciona un archivo CSV.";
+    return;
+  }
+
+  mensaje.textContent = "Leyendo archivo...";
+
+  const texto = await input.files[0].text();
+  const separador = texto.includes(";") ? ";" : ",";
+  const lineas = texto.trim().split(/\r?\n/);
+
+  const datos = lineas.slice(1).map(linea => {
+    const c = linea.split(separador);
+
+    return {
+      sucursal: c[0]?.trim(),
+      piezas_album: parseInt(limpiarNumero(c[1])),
+      venta_album: limpiarNumero(c[2]),
+      piezas_sobres: parseInt(limpiarNumero(c[3])),
+      venta_sobres: limpiarNumero(c[4])
+    };
+  }).filter(d => d.sucursal && d.sucursal.toUpperCase() !== "TOTAL");
+
+  mensaje.textContent = "Borrando datos anteriores...";
+
+  const { error: deleteError } = await supabase
+    .from("ventas_sucursales")
+    .delete()
+    .neq("id", 0);
+
+  if(deleteError){
+    mensaje.textContent = "Error al borrar datos: " + deleteError.message;
+    return;
+  }
+
+  mensaje.textContent = "Subiendo datos nuevos...";
+
+  const { error: insertError } = await supabase
+    .from("ventas_sucursales")
+    .insert(datos);
+
+  if(insertError){
+    mensaje.textContent = "Error al subir datos: " + insertError.message;
+    return;
+  }
+
+  mensaje.textContent = datos.length + " registros cargados correctamente.";
+}
+</script>
+
+</body>
+</html>
