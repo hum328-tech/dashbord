@@ -198,14 +198,14 @@ tr:nth-child(even){background:#fafafa}
         <span>Ingresos generales</span>
       </div>
       <div class="kpi">
-        <h3>Piezas totales</h3>
-        <p id="piezasTotal"></p>
-        <span>Volumen vendido</span>
+        <h3>Álbumes vendidos</h3>
+<p id="albumesTotal"></p>
+<span>Piezas de álbum</span>
       </div>
       <div class="kpi">
-        <h3>Ticket por pieza</h3>
-        <p id="ticket"></p>
-        <span>Promedio general</span>
+        <h3>Sobres vendidos</h3>
+<p id="sobresTotal"></p>
+<span>Paquetes de estampas</span>
       </div>
       <div class="kpi">
         <h3>Sucursal líder</h3>
@@ -216,15 +216,15 @@ tr:nth-child(even){background:#fafafa}
 
     <section class="charts">
       <div class="card">
-        <h3>Ventas por sucursal - Top 10</h3>
+        <h3>Venta total por sucursal - Top 10</h3>
         <canvas id="ventasChart"></canvas>
       </div>
       <div class="card">
-        <h3>Participación por venta</h3>
+        <h3>Álbumes vs sobres</h3>
         <canvas id="donutChart"></canvas>
       </div>
       <div class="card">
-        <h3>Piezas vendidas - Top 10</h3>
+        <h3>Sobres vendidos - Top 10</h3>
         <canvas id="piezasChart"></canvas>
       </div>
     </section>
@@ -236,10 +236,10 @@ tr:nth-child(even){background:#fafafa}
           <thead>
             <tr>
               <th>Sucursal</th>
-              <th>Piezas A</th>
-              <th>Venta A</th>
-              <th>Piezas B</th>
-              <th>Venta B</th>
+  <th>Álbumes</th>
+<th>Venta álbumes</th>
+<th>Sobres</th>
+<th>Venta sobres</th>
               <th>Total</th>
             </tr>
           </thead>
@@ -257,146 +257,172 @@ tr:nth-child(even){background:#fafafa}
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
 <script>
-const datos = [
-["MATRIZ",15,1375.05,312,7222.80],
-["SUCURSAL01",4,366.68,15,347.25],
-["SUCURSAL02",6,550.02,20,463.00],
-["SUCURSAL03",29,2658.43,192,4444.80],
-["SUCURSAL04",8,733.36,79,1828.85],
-["SUCURSAL05",4,366.68,382,8843.30],
-["SUCURSAL06",8,733.36,180,4167.00],
-["SUCURSAL07",1,91.67,31,717.65],
-["SUCURSAL08",9,825.03,180,4167.00],
-["SUCURSAL09",6,550.02,150,3472.50],
-["SUCURSAL10",14,1283.38,189,4375.35],
-["SUCURSAL11",3,275.01,36,833.40],
-["SUCURSAL12",1,91.67,1,23.15],
-["SUCURSAL13",8,733.36,138,3194.70],
-["SUCURSAL14",15,1375.05,123,2847.45],
-["SUCURSAL15",8,733.36,35,810.25],
-["SUCURSAL16",6,550.02,50,1157.50],
-["SUCURSAL17",7,641.69,56,1296.40],
-["SUCURSAL18",28,2566.76,274,6343.10],
-["SUCURSAL19",4,366.68,82,1898.30],
-["SUCURSAL20",15,1375.05,196,4537.40],
-["SUCURSAL21",2,183.34,27,625.05],
-["SUCURSAL22",7,641.69,34,787.10],
-["SUCURSAL23",2,183.34,53,1226.95],
-["SUCURSAL24",7,641.69,400,9260.00],
-["SUCURSAL25",2,183.34,15,347.25],
-["SUCURSAL26",16,1466.72,75,1736.25],
-["SUCURSAL27",5,458.35,56,1296.40],
-["SUCURSAL28",5,458.35,75,1736.25],
-["SUCURSAL29",25,2291.75,1222,28289.30],
-["SUCURSAL30",8,733.36,79,1828.85],
-["SUCURSAL31",13,1191.71,122,2824.30],
-["SUCURSAL32",2,183.34,7,162.05],
-["SUCURSAL33",7,641.69,78,1805.70]
-];
+const SUPABASE_URL = "https://fwfthzdrywbjyhndrxih.supabase.co";
+const SUPABASE_KEY = "sb_publishable_D3HRCOhWUIgmnMPpAN3E8Q__d7ZZCKi";
 
-const money = n => "$" + n.toLocaleString("es-MX",{minimumFractionDigits:2});
-const totalVenta = datos.reduce((a,d)=>a+d[2]+d[4],0);
-const totalPiezas = datos.reduce((a,d)=>a+d[1]+d[3],0);
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
-document.getElementById("ventaTotal").textContent = money(totalVenta);
-document.getElementById("piezasTotal").textContent = totalPiezas.toLocaleString("es-MX");
-document.getElementById("ticket").textContent = money(totalVenta/totalPiezas);
-
-const ordenadas = datos.map(d=>({
-  sucursal:d[0],
-  piezas:d[1]+d[3],
-  venta:d[2]+d[4],
-  a:d[1],
-  va:d[2],
-  b:d[3],
-  vb:d[4]
-})).sort((a,b)=>b.venta-a.venta);
-
-const top10 = ordenadas.slice(0,10);
-
-document.getElementById("tabla").innerHTML = ordenadas.slice(0,8).map(d=>`
-<tr>
-<td>${d.sucursal}</td>
-<td>${d.a}</td>
-<td>${money(d.va)}</td>
-<td>${d.b}</td>
-<td>${money(d.vb)}</td>
-<td><b>${money(d.venta)}</b></td>
-</tr>
-`).join("");
-
-document.getElementById("ranking").innerHTML = ordenadas.slice(0,6).map((d,i)=>`
-<div class="rank">
-  <strong>${i+1}. ${d.sucursal}</strong>
-  <span>${money(d.venta)}</span>
-</div>
-`).join("");
-
-new Chart(document.getElementById("ventasChart"),{
-  type:"bar",
-  data:{
-    labels:top10.map(d=>d.sucursal),
-    datasets:[{
-      label:"Venta total",
-      data:top10.map(d=>d.venta),
-      backgroundColor:"#f59a23",
-      borderRadius:8
-    }]
-  },
-  options:{
-    responsive:true,
-    maintainAspectRatio:false,
-    plugins:{legend:{display:false}},
-    scales:{
-      x:{ticks:{font:{size:10}}},
-      y:{ticks:{font:{size:10}}}
-    }
-  }
+const money = n => "$" + Number(n).toLocaleString("es-MX",{
+  minimumFractionDigits:2,
+  maximumFractionDigits:2
 });
 
-new Chart(document.getElementById("donutChart"),{
-  type:"doughnut",
-  data:{
-    labels:top10.map(d=>d.sucursal),
-    datasets:[{
-      data:top10.map(d=>d.venta),
-      backgroundColor:[
-        "#f0e52d","#f59a23","#222","#666","#999",
-        "#ffc857","#ffb703","#fb8500","#8d99ae","#adb5bd"
+async function cargarDatos(){
+  const { data, error } = await supabaseClient
+    .from("ventas_sucursales")
+    .select("*");
+
+  if(error){
+    console.error(error);
+    alert("Error al cargar datos desde Supabase");
+    return;
+  }
+
+  iniciarDashboard(data);
+}
+
+function iniciarDashboard(datos){
+
+  const ordenadas = datos.map(r => {
+    const albumes = Number(r.piezas_album) || 0;
+    const ventaAlbumes = Number(r.venta_album) || 0;
+    const sobres = Number(r.piezas_sobres) || 0;
+    const ventaSobres = Number(r.venta_sobres) || 0;
+
+    return {
+      sucursal: r.sucursal,
+      albumes,
+      ventaAlbumes,
+      sobres,
+      ventaSobres,
+      ventaTotal: ventaAlbumes + ventaSobres
+    };
+  }).sort((a,b)=>b.ventaTotal-a.ventaTotal);
+
+  const totalVenta = ordenadas.reduce((a,d)=>a+d.ventaTotal,0);
+  const totalAlbumes = ordenadas.reduce((a,d)=>a+d.albumes,0);
+  const totalSobres = ordenadas.reduce((a,d)=>a+d.sobres,0);
+
+  document.getElementById("ventaTotal").textContent = money(totalVenta);
+  document.getElementById("albumesTotal").textContent = totalAlbumes.toLocaleString("es-MX");
+  document.getElementById("sobresTotal").textContent = totalSobres.toLocaleString("es-MX");
+
+  const top10 = ordenadas.slice(0,10);
+
+  if(top10.length > 0){
+    document.querySelector(".badge").textContent =
+      "Sucursal estrella: " + top10[0].sucursal;
+
+    document.querySelector(".kpi:nth-child(4) p").textContent =
+      top10[0].sucursal.replace("SUCURSAL","SUC");
+  }
+
+  document.getElementById("tabla").innerHTML = ordenadas.slice(0,8).map(d=>`
+    <tr>
+      <td>${d.sucursal}</td>
+      <td>${d.albumes}</td>
+      <td>${money(d.ventaAlbumes)}</td>
+      <td>${d.sobres}</td>
+      <td>${money(d.ventaSobres)}</td>
+      <td><b>${money(d.ventaTotal)}</b></td>
+    </tr>
+  `).join("");
+
+  document.getElementById("ranking").innerHTML = ordenadas.slice(0,6).map((d,i)=>`
+    <div class="rank">
+      <strong>${i+1}. ${d.sucursal}</strong>
+      <span>${money(d.ventaTotal)}</span>
+    </div>
+  `).join("");
+
+  new Chart(document.getElementById("ventasChart"),{
+    type:"bar",
+    data:{
+      labels:top10.map(d=>d.sucursal),
+      datasets:[
+        {
+          label:"Venta álbumes",
+          data:top10.map(d=>d.ventaAlbumes),
+          backgroundColor:"#f0e52d",
+          borderRadius:8
+        },
+        {
+          label:"Venta sobres",
+          data:top10.map(d=>d.ventaSobres),
+          backgroundColor:"#f59a23",
+          borderRadius:8
+        }
       ]
-    }]
-  },
-  options:{
-    responsive:true,
-    maintainAspectRatio:false,
-    plugins:{legend:{position:"bottom",labels:{boxWidth:10,font:{size:10}}}}
-  }
-});
-
-new Chart(document.getElementById("piezasChart"),{
-  type:"bar",
-  data:{
-    labels:top10.map(d=>d.sucursal),
-    datasets:[{
-      label:"Piezas",
-      data:top10.map(d=>d.piezas),
-      backgroundColor:"#f0e52d",
-      borderRadius:8
-    }]
-  },
-  options:{
-    indexAxis:"y",
-    responsive:true,
-    maintainAspectRatio:false,
-    plugins:{legend:{display:false}},
-    scales:{
-      x:{ticks:{font:{size:10}}},
-      y:{ticks:{font:{size:10}}}
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{legend:{position:"bottom"}},
+      scales:{
+        x:{ticks:{font:{size:10}}},
+        y:{ticks:{font:{size:10}}}
+      }
     }
-  }
-});
-</script>
+  });
 
+  new Chart(document.getElementById("donutChart"),{
+    type:"doughnut",
+    data:{
+      labels:["Venta álbumes","Venta sobres"],
+      datasets:[{
+        data:[
+          ordenadas.reduce((a,d)=>a+d.ventaAlbumes,0),
+          ordenadas.reduce((a,d)=>a+d.ventaSobres,0)
+        ],
+        backgroundColor:["#f0e52d","#f59a23"]
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{
+          position:"bottom",
+          labels:{boxWidth:10,font:{size:10}}
+        }
+      }
+    }
+  });
+
+  const topSobres = [...ordenadas]
+    .sort((a,b)=>b.sobres-a.sobres)
+    .slice(0,10);
+
+  new Chart(document.getElementById("piezasChart"),{
+    type:"bar",
+    data:{
+      labels:topSobres.map(d=>d.sucursal),
+      datasets:[{
+        label:"Sobres vendidos",
+        data:topSobres.map(d=>d.sobres),
+        backgroundColor:"#f59a23",
+        borderRadius:8
+      }]
+    },
+    options:{
+      indexAxis:"y",
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{font:{size:10}}},
+        y:{ticks:{font:{size:10}}}
+      }
+    }
+  });
+}
+
+cargarDatos();
+</script>
 </body>
 </html>
