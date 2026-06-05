@@ -53,7 +53,7 @@ body{
 .main{
   padding:10px;
   display:grid;
-  grid-template-rows:55px 95px 330px 160px;
+  grid-template-rows:55px 95px 40px 330px 160px;
   gap:8px;
   min-width:1150px;
 }
@@ -99,6 +99,23 @@ body{
 .kpi span{
   color:#f59a23;
   font-size:13px;
+}
+  .filtros{
+  display:flex;
+  gap:10px;
+}
+.filtros button{
+  border:0;
+  background:#222;
+  color:white;
+  padding:8px 14px;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+.filtros button:hover{
+  background:#f59a23;
+  color:#111;
 }
 .charts{
   display:grid;
@@ -213,7 +230,11 @@ tr:nth-child(even){background:#fafafa}
         <span>Mayor venta total</span>
       </div>
     </section>
-
+<div class="filtros">
+  <button onclick="cambiarVista('comparado')">Comparado</button>
+  <button onclick="cambiarVista('albumes')">Solo álbumes</button>
+  <button onclick="cambiarVista('sobres')">Solo sobres</button>
+</div>
     <section class="charts">
       <div class="card">
         <h3>Venta total por sucursal - Top 10</h3>
@@ -271,7 +292,8 @@ const money = n => "$" + Number(n).toLocaleString("es-MX",{
   minimumFractionDigits:2,
   maximumFractionDigits:2
 });
-
+let datosGlobales = [];
+let graficaVentas = null;
 async function cargarDatos(){
   const { data, error } = await supabaseClient
     .from("ventas_sucursales")
@@ -287,6 +309,7 @@ async function cargarDatos(){
 }
 
 function iniciarDashboard(datos){
+  datosGlobales = datos;
 
   const ordenadas = datos.map(r => {
     const albumes = Number(r.piezas_album) || 0;
@@ -322,7 +345,7 @@ function iniciarDashboard(datos){
       top10[0].sucursal.replace("SUCURSAL","SUC");
   }
 
-  document.getElementById("tabla").innerHTML = ordenadas.slice(0,8).map(d=>`
+  document.getElementById("tabla").innerHTML = ordenadas.map(d=>`
     <tr>
       <td>${d.sucursal}</td>
       <td>${d.albumes}</td>
@@ -340,7 +363,7 @@ function iniciarDashboard(datos){
     </div>
   `).join("");
 
-  new Chart(document.getElementById("ventasChart"),{
+  graficaVentas = new Chart(document.getElementById("ventasChart"),{
     type:"bar",
     data:{
       labels:top10.map(d=>d.sucursal),
@@ -421,7 +444,85 @@ function iniciarDashboard(datos){
     }
   });
 }
+function cambiarVista(tipo){
+  const datos = datosGlobales.map(r => {
+    const albumes = Number(r.piezas_album) || 0;
+    const ventaAlbumes = Number(r.venta_album) || 0;
+    const sobres = Number(r.piezas_sobres) || 0;
+    const ventaSobres = Number(r.venta_sobres) || 0;
 
+    return {
+      sucursal: r.sucursal,
+      albumes,
+      ventaAlbumes,
+      sobres,
+      ventaSobres,
+      ventaTotal: ventaAlbumes + ventaSobres
+    };
+  });
+
+  if(graficaVentas){
+    graficaVentas.destroy();
+  }
+
+  let datasets = [];
+
+  if(tipo === "comparado"){
+    datasets = [
+      {
+        label:"Venta álbumes",
+        data:datos.map(d=>d.ventaAlbumes),
+        backgroundColor:"#f0e52d",
+        borderRadius:8
+      },
+      {
+        label:"Venta sobres",
+        data:datos.map(d=>d.ventaSobres),
+        backgroundColor:"#f59a23",
+        borderRadius:8
+      }
+    ];
+  }
+
+  if(tipo === "albumes"){
+    datasets = [
+      {
+        label:"Venta álbumes",
+        data:datos.map(d=>d.ventaAlbumes),
+        backgroundColor:"#f0e52d",
+        borderRadius:8
+      }
+    ];
+  }
+
+  if(tipo === "sobres"){
+    datasets = [
+      {
+        label:"Venta sobres",
+        data:datos.map(d=>d.ventaSobres),
+        backgroundColor:"#f59a23",
+        borderRadius:8
+      }
+    ];
+  }
+
+  graficaVentas = new Chart(document.getElementById("ventasChart"),{
+    type:"bar",
+    data:{
+      labels:datos.map(d=>d.sucursal),
+      datasets:datasets
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{legend:{position:"bottom"}},
+      scales:{
+        x:{ticks:{font:{size:8}}},
+        y:{ticks:{font:{size:10}}}
+      }
+    }
+  });
+}
 cargarDatos();
 </script>
 </body>
