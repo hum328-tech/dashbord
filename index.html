@@ -509,7 +509,7 @@ function cambiarVista(tipo){
   graficaVentas = new Chart(document.getElementById("ventasChart"),{
     type:"bar",
     data:{
-      labels:datos.map(d=>d.sucursal),
+      labels:datos.slice(0,10).map(d=>d.sucursal),
       datasets:datasets
     },
     options:{
