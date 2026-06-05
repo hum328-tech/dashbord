@@ -471,13 +471,13 @@ function cambiarVista(tipo){
     datasets = [
       {
         label:"Venta álbumes",
-        data:datos.map(d=>d.ventaAlbumes),
+        data:datos.slice(0,10).map(d=>d.ventaAlbumes),,
         backgroundColor:"#f0e52d",
         borderRadius:8
       },
       {
         label:"Venta sobres",
-        data:datos.map(d=>d.ventaSobres),
+        data:datos.slice(0,10).map(d=>d.ventaSobres),
         backgroundColor:"#f59a23",
         borderRadius:8
       }
@@ -488,7 +488,7 @@ function cambiarVista(tipo){
     datasets = [
       {
         label:"Venta álbumes",
-        data:datos.map(d=>d.ventaAlbumes),
+        data:datos.slice(0,10).map(d=>d.ventaAlbumes),,
         backgroundColor:"#f0e52d",
         borderRadius:8
       }
@@ -499,7 +499,7 @@ function cambiarVista(tipo){
     datasets = [
       {
         label:"Venta sobres",
-        data:datos.map(d=>d.ventaSobres),
+        data:datos.slice(0,10).map(d=>d.ventaSobres),
         backgroundColor:"#f59a23",
         borderRadius:8
       }
