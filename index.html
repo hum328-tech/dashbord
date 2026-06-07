@@ -277,16 +277,8 @@ tr:nth-child(even){background:#fafafa}
   </main>
 
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
 <script>
-const SUPABASE_URL = "https://fwfthzdrywbjyhndrxih.supabase.co";
-const SUPABASE_KEY = "sb_publishable_D3HRCOhWUIgmnMPpAN3E8Q__d7ZZCKi";
-
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
 
 const money = n => "$" + Number(n).toLocaleString("es-MX",{
   minimumFractionDigits:2,
@@ -295,15 +287,15 @@ const money = n => "$" + Number(n).toLocaleString("es-MX",{
 let datosGlobales = [];
 let graficaVentas = null;
 async function cargarDatos(){
-  const { data, error } = await supabaseClient
-    .from("ventas_sucursales")
-    .select("*");
 
-  if(error){
-    console.error(error);
-    alert("Error al cargar datos desde Supabase");
-    return;
-  }
+  const url = "https://script.google.com/macros/s/AKfycbw_bTOJi1m-UMursMRSpbqtrvHzQD7z9aOMYFef2a9sGO6EdaCZmagu0vl_nC-7-ISIfQ/exec";
+
+  const response = await fetch(url);
+
+  const data = await response.json();
+
+  iniciarDashboard(data);
+}
 
   iniciarDashboard(data);
 }
@@ -312,10 +304,10 @@ function iniciarDashboard(datos){
   datosGlobales = datos;
 
   const ordenadas = datos.map(r => {
-    const albumes = Number(r.piezas_album) || 0;
-    const ventaAlbumes = Number(r.venta_album) || 0;
-    const sobres = Number(r.piezas_sobres) || 0;
-    const ventaSobres = Number(r.venta_sobres) || 0;
+    const albumes = Number(r.albumes) || 0;
+const ventaAlbumes = Number(r.ventaAlbumes) || 0;
+const sobres = Number(r.sobres) || 0;
+const ventaSobres = Number(r.ventaSobres) || 0;
 
     return {
       sucursal: r.sucursal,
@@ -446,10 +438,10 @@ function iniciarDashboard(datos){
 }
 function cambiarVista(tipo){
   const datos = datosGlobales.map(r => {
-    const albumes = Number(r.piezas_album) || 0;
-    const ventaAlbumes = Number(r.venta_album) || 0;
-    const sobres = Number(r.piezas_sobres) || 0;
-    const ventaSobres = Number(r.venta_sobres) || 0;
+   r.albumes
+r.ventaAlbumes
+r.sobres
+r.ventaSobres
 
     return {
       sucursal: r.sucursal,
