@@ -60,8 +60,8 @@ body{
 .main{
   padding:10px;
   display:grid;
-  grid-template-rows:55px 95px 330px 160px;
-  gap:8px;
+  grid-template-rows:55px 105px 1fr auto;
+  gap:10px;
   min-width:1150px;
 }
 .header{
@@ -110,9 +110,9 @@ body{
  
 .charts{
   display:grid;
-  grid-template-columns:2fr 1.2fr 1fr;
+  grid-template-columns:2fr 1.1fr 1.1fr;
   gap:12px;
-  min-height:0;
+  min-height:360px;
 }
 .card{
   background:white;
@@ -221,11 +221,7 @@ tr:nth-child(even){background:#fafafa}
         <span>Mayor venta total</span>
       </div>
     </section>
-<div class="filtros">
-  <button onclick="cambiarVista('comparado')">Comparado</button>
-  <button onclick="cambiarVista('albumes')">Solo álbumes</button>
-  <button onclick="cambiarVista('sobres')">Solo sobres</button>
-</div>
+
     <section class="charts">
       <div class="card">
         <h3>Venta total por sucursal - Top 10</h3>
