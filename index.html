@@ -93,7 +93,7 @@ body{
 }
 .kpi p{
   margin:6px 0 0;
-  font-size:22px;
+  font-size:32px;
   font-weight:800;
 }
 .kpi span{
@@ -190,12 +190,12 @@ tr:nth-child(even){background:#fafafa}
     <h2>Reporte Comercial</h2>
 
     <div class="menu">
-      <div class="activo">Dashboard</div>
-      <div>Sucursales</div>
-      <div>Ventas</div>
-      <div>Piezas</div>
-      <div>Resumen</div>
-    </div>
+  <div class="activo" onclick="mostrarDashboard()">Dashboard</div>
+  <div onclick="mostrarSucursales()">Sucursales</div>
+  <div onclick="cambiarVista('comparado')">Comparado</div>
+  <div onclick="cambiarVista('albumes')">Álbumes</div>
+  <div onclick="cambiarVista('sobres')">Sobres</div>
+</div>
   </aside>
 
   <main class="main">
@@ -250,7 +250,7 @@ tr:nth-child(even){background:#fafafa}
       </div>
     </section>
 
-    <section class="bottom">
+    <section class="bottom" id="vistaSucursales" style="display:none;">
       <div class="card">
         <h3>Resumen por sucursal</h3>
         <table>
@@ -378,7 +378,7 @@ const ventaSobres = Number(r.ventaSobres) || 0;
       plugins:{legend:{position:"bottom"}},
       scales:{
         x:{ticks:{font:{size:10}}},
-        y:{ticks:{font:{size:10}}}
+        y:{ticks:{font:{size:12}}}
       }
     }
   });
@@ -507,11 +507,18 @@ function cambiarVista(tipo){
       maintainAspectRatio:false,
       plugins:{legend:{position:"bottom"}},
       scales:{
-        x:{ticks:{font:{size:8}}},
+        x:{ticks:{font:{size:12}}},
         y:{ticks:{font:{size:10}}}
       }
     }
   });
+}
+  function mostrarDashboard(){
+  document.getElementById("vistaSucursales").style.display = "none";
+}
+
+function mostrarSucursales(){
+  document.getElementById("vistaSucursales").style.display = "grid";
 }
 cargarDatos();
 </script>
