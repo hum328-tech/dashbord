@@ -436,10 +436,10 @@ const ventaSobres = Number(r.ventaSobres) || 0;
 }
 function cambiarVista(tipo){
   const datos = datosGlobales.map(r => {
-   r.albumes
-r.ventaAlbumes
-r.sobres
-r.ventaSobres
+    const albumes = Number(r.albumes) || 0;
+    const ventaAlbumes = Number(r.ventaAlbumes) || 0;
+    const sobres = Number(r.sobres) || 0;
+    const ventaSobres = Number(r.ventaSobres) || 0;
 
     return {
       sucursal: r.sucursal,
@@ -449,7 +449,7 @@ r.ventaSobres
       ventaSobres,
       ventaTotal: ventaAlbumes + ventaSobres
     };
-  });
+  }).sort((a,b)=>b.ventaTotal-a.ventaTotal);
 
   if(graficaVentas){
     graficaVentas.destroy();
