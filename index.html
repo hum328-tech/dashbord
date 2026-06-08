@@ -44,6 +44,13 @@ body{
   margin-bottom:10px;
   background:#333;
   font-size:14px;
+   cursor:pointer;
+  transition:all .2s ease;
+}
+  .menu div:hover{
+  background:#f59a23;
+  color:#111;
+  transform:translateX(4px);
 }
 .menu .activo{
   background:#f59a23;
@@ -53,7 +60,7 @@ body{
 .main{
   padding:10px;
   display:grid;
-  grid-template-rows:55px 95px 40px 330px 160px;
+  grid-template-rows:55px 95px 330px 160px;
   gap:8px;
   min-width:1150px;
 }
@@ -100,23 +107,7 @@ body{
   color:#f59a23;
   font-size:13px;
 }
-  .filtros{
-  display:flex;
-  gap:10px;
-}
-.filtros button{
-  border:0;
-  background:#222;
-  color:white;
-  padding:8px 14px;
-  border-radius:10px;
-  font-weight:700;
-  cursor:pointer;
-}
-.filtros button:hover{
-  background:#f59a23;
-  color:#111;
-}
+ 
 .charts{
   display:grid;
   grid-template-columns:2fr 1.2fr 1fr;
@@ -189,12 +180,12 @@ tr:nth-child(even){background:#fafafa}
     <img src="logo.png" class="logo">
     <h2>Reporte Comercial</h2>
 
-    <div class="menu">
-  <div class="activo" onclick="mostrarDashboard()">Dashboard</div>
-  <div onclick="mostrarSucursales()">Sucursales</div>
-  <div onclick="cambiarVista('comparado')">Comparado</div>
-  <div onclick="cambiarVista('albumes')">Álbumes</div>
-  <div onclick="cambiarVista('sobres')">Sobres</div>
+<div class="menu">
+  <div class="activo" onclick="activarMenu(this); mostrarDashboard(); cambiarVista('comparado')">Dashboard</div>
+  <div onclick="activarMenu(this); mostrarSucursales()">Sucursales</div>
+  <div onclick="activarMenu(this); cambiarVista('comparado')">Comparado</div>
+  <div onclick="activarMenu(this); cambiarVista('albumes')">Álbumes</div>
+  <div onclick="activarMenu(this); cambiarVista('sobres')">Sobres</div>
 </div>
   </aside>
 
@@ -519,6 +510,12 @@ function cambiarVista(tipo){
 
 function mostrarSucursales(){
   document.getElementById("vistaSucursales").style.display = "grid";
+}
+  function activarMenu(elemento){
+  document.querySelectorAll(".menu div").forEach(item=>{
+    item.classList.remove("activo");
+  });
+  elemento.classList.add("activo");
 }
 cargarDatos();
 </script>
